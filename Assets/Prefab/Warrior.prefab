@@ -128,15 +128,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Warrior
   maxHealth: 100
   currentHealth: 100
-  attackDamage: 1
-  currentAttackCooldown: 0
-  attackCooldown: 1
-  attackRange: 5
+  attackDamage: 50
+  attackRange: 1
   moveSpeed: 1
   armour: 1
-  deploymentCost: 0
+  deploymentCost: 50
   animator: {fileID: 0}
   gameManager: {fileID: 0}
   tilemap: {fileID: 0}
+  unitManager: {fileID: 0}
   currentTilePos: {x: 0, y: 0, z: 0}
   team: 0

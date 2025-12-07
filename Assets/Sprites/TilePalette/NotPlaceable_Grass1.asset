@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eee97d6636a090a48a48ba0402fb66bf, type: 3}
-  m_Name: Grass1
+  m_Name: NotPlaceable_Grass1
   m_EditorClassIdentifier: Assembly-CSharp::CustomTile
   m_Sprite: {fileID: -1881519487255436877, guid: 4f1e244c934b27f4e90ea360acfd5627, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -36,4 +36,4 @@ MonoBehaviour:
   m_ColliderType: 1
   tileType: 0
   defaultWalkable: 1
-  defaultDeployable: 1
+  defaultDepolyable: 0

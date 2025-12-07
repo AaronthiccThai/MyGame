@@ -8,8 +8,6 @@ public class Unit : MonoBehaviour
     public int maxHealth;
     public int currentHealth;
     public int attackDamage;
-    public float currentAttackCooldown;
-    public float attackCooldown;
     public float attackRange;
     public float moveSpeed;
     public float armour;
@@ -19,7 +17,7 @@ public class Unit : MonoBehaviour
     public Animator animator;
     public GameManager gameManager;
     public Tilemap tilemap;
-
+    public UnitManager unitManager;
     [Header("Grid Position")]
     public Vector3Int currentTilePos;
     public static readonly Vector3Int[] oddr =
@@ -35,17 +33,16 @@ public class Unit : MonoBehaviour
     }
 
     public Team team;
+    private void Awake()
+    {
+        gameManager = FindFirstObjectByType<GameManager>();
+        tilemap = FindFirstObjectByType<Tilemap>();
+        unitManager = FindFirstObjectByType<UnitManager>();
+    }
 
-    public virtual void Start()
+    public void Start()
     {
         currentHealth = maxHealth;
-        currentAttackCooldown = attackCooldown;
-
-        if (gameManager == null)
-            gameManager = FindFirstObjectByType<GameManager>();
-
-        if (tilemap == null)
-            tilemap = FindFirstObjectByType<Tilemap>();
     }
 
     public void Update()
@@ -61,16 +58,11 @@ public class Unit : MonoBehaviour
                 {
                     MoveTowardClosestEnemy(this);
                 }
-                else
-                {
-                    attack(closest);
-                }
+
+
             }
-            
 
         }
-
-
     }
 
     public virtual void TakeDamage(int amount)
@@ -87,16 +79,7 @@ public class Unit : MonoBehaviour
     public virtual void Die()
     {
         Destroy(gameObject);
-    }
-    public virtual bool canAttack(Unit target)
-    {
-        return currentAttackCooldown <= 0f;
-    }
-
-    // Convert grid pos into cube coords
-    public virtual bool inAttackRange(Unit a, Unit b, float range)
-    {
-        return false;
+        unitManager.RemoveUnitFromList(this);
     }
 
     public Vector3Int OddrToCube(Vector3Int h)
@@ -119,15 +102,6 @@ public class Unit : MonoBehaviour
         );
     }
 
-    public virtual void attack(Unit target)
-    {
-        if (canAttack(target))
-        {
-            target.TakeDamage(attackDamage);
-            currentAttackCooldown = attackCooldown; 
-        }
-    }
-
 
     public Unit FindClosestEnemy(Unit self)
     {
@@ -140,8 +114,10 @@ public class Unit : MonoBehaviour
         {
             Vector3Int currentPos = queue.Dequeue();
             TileInstance tile = gameManager.GetTileAtPosition(currentPos);
+            // IT IS FINDING THE ENEMY
             if (tile.unit != null && tile.unit.team != self.team)
             {
+                Debug.Log(tile.unit.name);
                 return tile.unit;
             }
             foreach (Vector3Int neighbor in GetHexNeighbors(currentPos))
@@ -161,6 +137,7 @@ public class Unit : MonoBehaviour
         }
         return null; 
     }
+    // BUGFIX, ITS NOT FINDING THE PATH OR SMTH MAYBE
     public List<Vector3Int> FindPath(Vector3Int start, Vector3Int goal)
     {
         Queue<Vector3Int> queue = new();
@@ -210,23 +187,13 @@ public class Unit : MonoBehaviour
     {
         Unit enemy = FindClosestEnemy(self);
         if (enemy == null) return;
+        //Debug.Log("FOUND ENEMY" + enemy.name);
 
-        // STOP if in attack range
-        int dist = HexDistance(self.currentTilePos, enemy.currentTilePos);
-        if (dist <= attackRange)
-        {
-            // In range try attacking instead of moving
-            attack(enemy);
-            Debug.Log("ATTACKING INSTEAD OF MOVING");
-            return;
-        }
-
-        // Otherwise, move toward a tile beside the enemy
         Vector3Int targetTile = GetTileAdjacentTo(enemy);
         List<Vector3Int> path = FindPath(self.currentTilePos, targetTile);
+      
 
         if (path == null || path.Count == 0) return;
-
         MoveUnitToTile(self, path[0]);
     }
     Vector3Int GetTileAdjacentTo(Unit enemy)
@@ -240,7 +207,7 @@ public class Unit : MonoBehaviour
             }
         }
 
-        return enemy.currentTilePos; // fallback (should rarely happen)
+        return enemy.currentTilePos; 
     }
 
     public void MoveUnitToTile(Unit unit, Vector3Int newTilePos)
@@ -261,7 +228,7 @@ public class Unit : MonoBehaviour
         worldPos.z = 0; 
         unit.transform.position = worldPos;
 
-        if (unit.animator != null) unit.animator.SetTrigger("Move");
+        //if (unit.animator != null) unit.animator.SetTrigger("Move"); Placeholder for move animation
     }
 
     public IEnumerable<Vector3Int> GetHexNeighbors(Vector3Int pos)
@@ -287,5 +254,56 @@ public class Unit : MonoBehaviour
             yield return pos + new Vector3Int(-1, -1, 0);
         }
     }
+
+    public virtual bool inAttackRange(Unit a, Unit b, float range)
+    {
+        int dist = HexDistance(a.currentTilePos, b.currentTilePos);
+        return dist <= range;
+    }
+    public void AttackClosestEnemy(Unit self)
+    {
+        Unit enemy = FindClosestEnemy(self);
+        if (enemy == null) return;
+
+        // Check range
+        if (!inAttackRange(self, enemy, attackRange))
+        {
+            Debug.Log(self.name + " cannot reach " + enemy.name);
+            return;
+        }
+
+        // Attack
+        Debug.Log(self.name + " attacks " + enemy.name);
+
+        enemy.TakeDamage(self.attackDamage);
+
+        // Optional animation
+        if (self.animator != null)
+            self.animator.SetTrigger("Attack");
+
+        if (enemy.currentHealth <= 0)
+        {
+            Debug.Log(enemy.name + " has been defeated!");
+            Destroy(enemy);
+        }
+    }
+    public void EnemyUnitTurn()
+    {
+        Unit closest = FindClosestEnemy(this);
+        if (closest == null) return;
+
+        // If in range, ATTACK
+        if (inAttackRange(this, closest, attackRange))
+        {
+            AttackClosestEnemy(this);
+        }
+        else
+        {
+            // If NOT in range, MOVE
+            MoveTowardClosestEnemy(this);
+        }
+    }
+
+
 }
 

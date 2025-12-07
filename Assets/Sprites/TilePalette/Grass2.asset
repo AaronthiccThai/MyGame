@@ -35,5 +35,5 @@ MonoBehaviour:
   m_Flags: 1
   m_ColliderType: 1
   tileType: 0
-  isWalkable: 1
-  isOccupied: 0
+  defaultWalkable: 1
+  defaultDeployable: 1

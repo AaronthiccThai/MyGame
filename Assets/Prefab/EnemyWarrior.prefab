@@ -105,9 +105,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Warrior
   maxHealth: 100
   currentHealth: 100
-  attackDamage: 1
-  currentAttackCooldown: 11
-  attackCooldown: 1
+  attackDamage: 50
   attackRange: 1
   moveSpeed: 1
   armour: 1

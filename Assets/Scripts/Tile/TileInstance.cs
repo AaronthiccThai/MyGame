@@ -7,7 +7,7 @@ public class TileInstance
 
     public bool isWalkable;
     public bool isOccupied;
-
-    public Unit unit; // placeholder, will make unit parent class later
+    public bool isDeployable;
+    public Unit unit;
 
 }

@@ -11,5 +11,6 @@ public class CustomTile : Tile
 {
     public TileType tileType;
     public bool defaultWalkable = true;
+    public bool defaultDeployable = false;
 }
 
