@@ -5,14 +5,17 @@ using UnityEngine.Tilemaps;
 
 public class GameManager : MonoBehaviour
 {
+    [Header("References")]
     public Tilemap tilemap;
     public TileInstance[,] tiles;
-    public List<GameObject> testUnitPrefabs;
+    // placeholder until unit selection from MENU is done, how it can be done is that changing the loadout inside menu will change game manager, 
+    // Don't need to change anything else since it references index when 
+    // Will just change the unit card image 
+    public List<GameObject> testUnitPrefabs; 
     public UnitManager unitManager;
-
+    [Header("Settings")]
     private int selectedUnitIndex = 0;
     public int funds;
-
     private void Awake()
     {
         unitManager = FindFirstObjectByType<UnitManager>();
@@ -27,17 +30,16 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        HandleUnitSelection();
+        //HandleUnitSelection();
         if (Input.GetMouseButtonDown(0))
         {
             if (EventSystem.current.IsPointerOverGameObject())
                 return;
 
             checkTilesInfo();
-            TestPlaceUnit();
+            //TestPlaceUnit();
         }
     }
-
     /* Debug: Info on clicked tile */
     private void checkTilesInfo()
     {
@@ -112,20 +114,9 @@ public class GameManager : MonoBehaviour
         return tiles[x, y];
     }
 
-    /* Handle selecting unit prefab */
-    private void HandleUnitSelection()
-    {
-        if (Input.GetKeyDown(KeyCode.Alpha2)) selectedUnitIndex = 0;
-        if (Input.GetKeyDown(KeyCode.Alpha3)) selectedUnitIndex = 1;
-        if (Input.GetKeyDown(KeyCode.Alpha4)) selectedUnitIndex = 2;
-        if (Input.GetKeyDown(KeyCode.Alpha5)) selectedUnitIndex = 3;
-        if (Input.GetKeyDown(KeyCode.Alpha6)) selectedUnitIndex = 4;
-
-        selectedUnitIndex = Mathf.Clamp(selectedUnitIndex, 0, testUnitPrefabs.Count - 1);
-    }
 
     /* Place a unit on a tile */
-    private void PlaceUnit(Unit unit, Vector3Int gridPos)
+    public void PlaceUnit(Unit unit, Vector3Int gridPos)
     {
         if (unit == null) return;
         if (unit.deploymentCost > funds)
@@ -156,41 +147,6 @@ public class GameManager : MonoBehaviour
         funds -= unit.deploymentCost;
     }
 
-    /* Test placing unit with left click */
-    private void TestPlaceUnit()
-    {
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector3Int gridPos = tilemap.WorldToCell(mousePos);
-        gridPos.z = 0;
 
-        BoundsInt bounds = tilemap.cellBounds;
-        int x = gridPos.x - bounds.xMin;
-        int y = gridPos.y - bounds.yMin;
-
-        // Out of bounds
-        if (x < 0 || x >= tiles.GetLength(0) || y < 0 || y >= tiles.GetLength(1))
-            return;
-
-        TileInstance tile = tiles[x, y];
-
-        // Tile not placeable
-        if (tile == null || !tile.isWalkable || tile.isOccupied)
-            return;
-
-        // Get the unit prefab cost WITHOUT instantiating
-        Unit prefabUnit = testUnitPrefabs[selectedUnitIndex].GetComponent<Unit>();
-
-        if (prefabUnit.deploymentCost > funds)
-        {
-            Debug.Log("Not enough funds.");
-            return;
-        }
-
-        // All checks passed, now instantiate
-        GameObject obj = Instantiate(testUnitPrefabs[selectedUnitIndex]);
-        Unit unit = obj.GetComponent<Unit>();
-
-        PlaceUnit(unit, gridPos);
-    }
 
 }

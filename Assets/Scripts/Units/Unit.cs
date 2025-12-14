@@ -12,12 +12,14 @@ public class Unit : MonoBehaviour
     public float moveSpeed;
     public float armour;
     public int deploymentCost;
+    public string unitName;
 
     [Header("References")]
     public Animator animator;
     public GameManager gameManager;
     public Tilemap tilemap;
     public UnitManager unitManager;
+
     [Header("Grid Position")]
     public Vector3Int currentTilePos;
     public static readonly Vector3Int[] oddr =
@@ -38,6 +40,7 @@ public class Unit : MonoBehaviour
         gameManager = FindFirstObjectByType<GameManager>();
         tilemap = FindFirstObjectByType<Tilemap>();
         unitManager = FindFirstObjectByType<UnitManager>();
+        // Manually pass in the two tile maps
     }
 
     public void Start()
@@ -90,6 +93,7 @@ public class Unit : MonoBehaviour
 
         return new Vector3Int(x, y, z);
     }
+    // Heuristic used for pathfinding
     public int HexDistance(Vector3Int a, Vector3Int b)
     {
         Vector3Int ac = OddrToCube(a);
@@ -137,7 +141,7 @@ public class Unit : MonoBehaviour
         }
         return null; 
     }
-    // BUGFIX, ITS NOT FINDING THE PATH OR SMTH MAYBE
+    // Reconstruct the shortest path from start to goal
     public List<Vector3Int> FindPath(Vector3Int start, Vector3Int goal)
     {
         Queue<Vector3Int> queue = new();
@@ -303,6 +307,7 @@ public class Unit : MonoBehaviour
             MoveTowardClosestEnemy(this);
         }
     }
+
 
 
 }

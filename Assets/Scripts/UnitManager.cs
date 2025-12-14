@@ -5,8 +5,11 @@ using UnityEngine.Tilemaps;
 // TODO - State manager
 public class UnitManager : MonoBehaviour
 {
+    [Header("Unit Storage")]
     private List<Unit> enemyUnits = new List<Unit>();
     private List<Unit> playerUnits = new List<Unit>();
+
+    [Header("References")]
     public Tilemap tilemap;
     public GameManager gameManager;
 
