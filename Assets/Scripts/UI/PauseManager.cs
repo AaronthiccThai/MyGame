@@ -1,11 +1,12 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PauseManager : MonoBehaviour
 {
     public static PauseManager Instance;
 
     [SerializeField] GameObject pauseMenuUI;
-    private bool isPaused = false;
+    public bool isPaused = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
@@ -14,23 +15,20 @@ public class PauseManager : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    public void OnPause(InputAction.CallbackContext ctx)
     {
-        
+        if (!ctx.performed) return;
+        TogglePause();
     }
-    
-    void TogglePause()
+
+    public void TogglePause()
     {
-        if (isPaused)
-        {
-            Resume();
-        }
-        else
-        {
-            Pause();
-        }   
+        if (isPaused) Resume();
+        else Pause();
     }
-    // Button to call this
+
+
+    // Input action to call this 
     void Pause()
     {
         isPaused = true;

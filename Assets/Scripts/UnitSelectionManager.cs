@@ -20,8 +20,7 @@ public class UnitSelectionManager : MonoBehaviour
     public List<GameObject> unitPrefabs;     
 
     private GameObject selectedUnitPrefab;
-    public int previousSelectedIndex = -1;
-
+    private int previousSelectedIndex = -1;
     private bool isDeploying = false;
     void Awake()
     {
@@ -46,21 +45,6 @@ public class UnitSelectionManager : MonoBehaviour
             TryPlaceUnits();
         }
     }
-    private void TrySelectPrefabAtIndex(int i)
-    {
-        if (i < 0 || i >= unitPrefabs.Count) return;
-
-        if (i == previousSelectedIndex)
-        {
-            CancelDeployment();
-            previousSelectedIndex = -1;
-            return;                    
-        }
-
-        previousSelectedIndex = i;
-        SelectUnit(unitPrefabs[i]);
-    }
-
 
     private void HandleUnitSelection()
     {
@@ -74,11 +58,27 @@ public class UnitSelectionManager : MonoBehaviour
         if (Input.GetMouseButtonDown(1))
             CancelDeployment();
     }
+    private void TrySelectPrefabAtIndex(int i)
+    {
+        if (i < 0 || i >= unitPrefabs.Count) return;
+
+        if (i == previousSelectedIndex)
+        {
+            CancelDeployment();
+            previousSelectedIndex = -1;
+            return;
+        }
+
+        previousSelectedIndex = i;
+        SelectUnit(unitPrefabs[i]);
+    }
+
 
     public void SelectUnit(GameObject selectedPrefab)
     {
         if (selectedPrefab == null) return;
-
+        if (PauseManager.Instance != null && PauseManager.Instance.isPaused)
+            return;
         selectedUnitPrefab = selectedPrefab;
         isDeploying = true;
         ShowPreview(selectedPrefab);
@@ -95,6 +95,8 @@ public class UnitSelectionManager : MonoBehaviour
 
     public void TryPlaceUnits()
     {
+        if (PauseManager.Instance != null && PauseManager.Instance.isPaused)
+            return;
         Vector3 world = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector3Int cell = tilemap.WorldToCell(world);
         cell.z = 0;
@@ -119,6 +121,7 @@ public class UnitSelectionManager : MonoBehaviour
         CancelDeployment();
     }
 
+    // Might turn this into show deployable tiles for THAT type of unit so red will also have other placeable tiles
     private void ShowDeployableTiles()
     {
         foreach (TileInstance t in gameManager.tiles)

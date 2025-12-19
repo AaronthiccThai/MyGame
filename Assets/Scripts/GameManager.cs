@@ -8,12 +8,10 @@ public class GameManager : MonoBehaviour
     [Header("References")]
     public Tilemap tilemap;
     public TileInstance[,] tiles;
-    // placeholder until unit selection from MENU is done, how it can be done is that changing the loadout inside menu will change game manager, 
-    // Don't need to change anything else since it references index when 
-    // Will just change the unit card image 
     public List<GameObject> testUnitPrefabs; 
     public UnitManager unitManager;
     [Header("Settings")]
+
     private int selectedUnitIndex = 0;
     public int funds;
     private void Awake()

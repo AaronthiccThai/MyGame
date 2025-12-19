@@ -134,12 +134,13 @@ MonoBehaviour:
   attackRange: 1
   moveSpeed: 1
   armour: 1
-  deploymentCost: 50
+  deploymentCost: 0
   unitName: Warrior
   animator: {fileID: 0}
   gameManager: {fileID: 0}
   tilemap: {fileID: 0}
   unitManager: {fileID: 0}
+  runClip: {fileID: 7400000, guid: c9ca5d778e2018640a81e2707d374793, type: 2}
   currentTilePos: {x: 0, y: 0, z: 0}
   team: 0
 --- !u!114 &-6658195023387952899

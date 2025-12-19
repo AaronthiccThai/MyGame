@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -19,6 +20,7 @@ public class Unit : MonoBehaviour
     public GameManager gameManager;
     public Tilemap tilemap;
     public UnitManager unitManager;
+    public AnimationClip runClip;
 
     [Header("Grid Position")]
     public Vector3Int currentTilePos;
@@ -40,6 +42,7 @@ public class Unit : MonoBehaviour
         gameManager = FindFirstObjectByType<GameManager>();
         tilemap = FindFirstObjectByType<Tilemap>();
         unitManager = FindFirstObjectByType<UnitManager>();
+        animator = GetComponent<Animator>();
         // Manually pass in the two tile maps
     }
 
@@ -214,25 +217,43 @@ public class Unit : MonoBehaviour
         return enemy.currentTilePos; 
     }
 
+
     public void MoveUnitToTile(Unit unit, Vector3Int newTilePos)
     {
         TileInstance newTile = gameManager.GetTileAtPosition(newTilePos);
-        if (newTile == null || !newTile.isWalkable) return;
-        if (newTile.unit != null) return;
-        
+        if (newTile == null || !newTile.isWalkable || newTile.unit != null)
+            return;
 
+        StartCoroutine(MoveCoroutine(unit, newTilePos));
+    }
+    private IEnumerator MoveCoroutine(Unit unit, Vector3Int newTilePos)
+    {
         TileInstance oldTile = gameManager.GetTileAtPosition(unit.currentTilePos);
+        TileInstance newTile = gameManager.GetTileAtPosition(newTilePos);
+
         if (oldTile != null) oldTile.unit = null;
-
-
         newTile.unit = unit;
+
+        animator.SetBool("isRunning", true);
+
+        Vector3 start = unit.transform.position;
+        Vector3 end = tilemap.CellToWorld(newTilePos);
+        end.z = 0f;
+
+        float t = 0f;
+        float duration = runClip.length;
+
+        while (t < 1f)
+        {
+            t += Time.deltaTime / duration;
+            unit.transform.position = Vector3.Lerp(start, end, t);
+            yield return null;
+        }
+
+        unit.transform.position = end;
         unit.currentTilePos = newTilePos;
 
-        Vector3 worldPos = tilemap.CellToWorld(newTilePos);
-        worldPos.z = 0; 
-        unit.transform.position = worldPos;
-
-        //if (unit.animator != null) unit.animator.SetTrigger("Move"); Placeholder for move animation
+        animator.SetBool("isRunning", false);
     }
 
     public IEnumerable<Vector3Int> GetHexNeighbors(Vector3Int pos)
@@ -275,15 +296,11 @@ public class Unit : MonoBehaviour
             Debug.Log(self.name + " cannot reach " + enemy.name);
             return;
         }
-
+        
         // Attack
-        Debug.Log(self.name + " attacks " + enemy.name);
-
+        animator.SetTrigger("Attack");
         enemy.TakeDamage(self.attackDamage);
 
-        // Optional animation
-        if (self.animator != null)
-            self.animator.SetTrigger("Attack");
 
         if (enemy.currentHealth <= 0)
         {

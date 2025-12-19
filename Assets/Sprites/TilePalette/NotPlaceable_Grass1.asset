@@ -36,4 +36,4 @@ MonoBehaviour:
   m_ColliderType: 1
   tileType: 0
   defaultWalkable: 1
-  defaultDepolyable: 0
+  defaultDeployable: 1

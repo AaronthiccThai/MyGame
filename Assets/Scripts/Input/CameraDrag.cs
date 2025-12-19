@@ -20,6 +20,8 @@ public class CameraDrag : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (PauseManager.Instance != null && PauseManager.Instance.isPaused)
+            return;
         if (!isDragging) return;
         difference = GetMousePosition - transform.position;
         transform.position = origin - difference;
