@@ -217,6 +217,16 @@ public class Unit : MonoBehaviour
         return enemy.currentTilePos; 
     }
 
+    void FaceTarget(Vector3 worldTargetPos)
+    {
+        if (worldTargetPos.x == transform.position.x)
+            return;
+
+        Vector3 scale = transform.localScale;
+        scale.x = Mathf.Abs(scale.x) * (worldTargetPos.x > transform.position.x ? 1 : -1);
+        transform.localScale = scale;
+    }
+
 
     public void MoveUnitToTile(Unit unit, Vector3Int newTilePos)
     {
@@ -234,11 +244,12 @@ public class Unit : MonoBehaviour
         if (oldTile != null) oldTile.unit = null;
         newTile.unit = unit;
 
-        animator.SetBool("isRunning", true);
 
         Vector3 start = unit.transform.position;
         Vector3 end = tilemap.CellToWorld(newTilePos);
         end.z = 0f;
+        FaceTarget(end);
+        animator.SetBool("isRunning", true);
 
         float t = 0f;
         float duration = runClip.length;
@@ -289,6 +300,9 @@ public class Unit : MonoBehaviour
     {
         Unit enemy = FindClosestEnemy(self);
         if (enemy == null) return;
+        FaceTarget(enemy.transform.position);
+
+        animator.SetTrigger("Attack");
 
         // Check range
         if (!inAttackRange(self, enemy, attackRange))
@@ -298,7 +312,6 @@ public class Unit : MonoBehaviour
         }
         
         // Attack
-        animator.SetTrigger("Attack");
         enemy.TakeDamage(self.attackDamage);
 
 
