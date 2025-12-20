@@ -3,7 +3,9 @@
 ## How to play
 
 Deploy characters using "1" / "2" and play a basic RTS 
+
 Mouse wheel scroll for zoom
+
 RMB for moving around map
 
 ## Link to Game
