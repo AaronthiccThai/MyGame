@@ -1,5 +1,5 @@
 # Basic game in Unity
-
+First game I made in Unity to learn the engine and a bit of the langauge 
 ## How to play
 
 Deploy characters using "1" / "2" and play a basic RTS 
